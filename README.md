@@ -48,8 +48,12 @@ After finding the distances between test and train inputs, to know in which clas
 >Among KNN there could be voting tie,<br>
 >One of the way to broke voting tie is Distance Weighted KNN, i.e., `sum of inverse of distances of all predicted labels`<br><br>
 > ![equation](https://latex.codecogs.com/svg.image?\bg_white&space;\sum&space;\frac{1}{distance})
-> <br>for all predicted labels in KNN
+> <br>for all k nearest neighbours in KNN
 
 > #### _Majority Voting_
 >Among KNN there could be voting tie,<br>
 >Another of the way to broke voting tie is Majority Based KNN, i.e., `out of predicted labels which label is most repeated that label does chosed`
+
+### _Hyperparameter Tuning_
+
+Choosing what are the best values of  `n` and `k` that gives the best accuracy.
