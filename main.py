@@ -25,7 +25,7 @@ class HandWritterDigitRecognition:
         return shuffled_variables, shuffled_labels
 
     def get_best_k_n_values_using_validation_set(
-            self, variables, labels, validation_split_percent, possible_valus_of_n
+            self, variables, labels, validation_split_percent, possible_values_of_n
     ):
         import math
         shuffled_variables, shuffled_labels = \
@@ -39,7 +39,7 @@ class HandWritterDigitRecognition:
         validation_outputs = shuffled_labels[train_data_count:]
 
         accuracy_matrix = np.empty(shape=(train_inputs.shape[0], train_data_count))
-        for n_idx, n in enumerate(possible_valus_of_n):
+        for n_idx, n in enumerate(possible_values_of_n):
             for k_idx, k in enumerate(range(1, train_data_count+1)):
                 predicted_labels = self.majority_based_knn(
                     train_inputs=train_inputs, train_outputs=train_outputs,
@@ -54,8 +54,8 @@ class HandWritterDigitRecognition:
         max_accuracy = np.max(accuracy_matrix)
         ties = (accuracy_matrix == max_accuracy)
 
-        n_idx = np.any(ties, axis=1)
-        n = possible_valus_of_n[n_idx]
+        n_idx = np.argmax(np.any(ties, axis=1))
+        n = possible_values_of_n[n_idx]
         k = np.argmax(ties[n_idx, :]) + 1
         return np.array([k, n], dtype=int)
 
@@ -106,7 +106,7 @@ class HandWritterDigitRecognition:
                 tied_class_indices = label_indices[num_of_unique_class_labels-highest_label_repeat:]
                 tied_class_weights = label_wise_weights[test_idx][tied_class_indices]
                 max_weight_idx = np.argmax(tied_class_weights)
-                max_idx = tied_class_weights[max_weight_idx]
+                max_idx = tied_class_indices[max_weight_idx]
                 output_labels[test_idx] = unique_class_labels[max_idx]
 
         return output_labels
