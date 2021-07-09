@@ -25,7 +25,7 @@ class HandWritterDigitRecognition:
         return shuffled_variables, shuffled_labels
 
     def get_best_k_n_values_using_validation_set(
-            self, variables, labels, validation_split_percent
+            self, variables, labels, validation_split_percent, possible_valus_of_n
     ):
         import math
         shuffled_variables, shuffled_labels = \
@@ -37,6 +37,27 @@ class HandWritterDigitRecognition:
         train_outputs = shuffled_labels[:train_data_count]
         validation_inputs = shuffled_variables[train_data_count:]
         validation_outputs = shuffled_labels[train_data_count:]
+
+        accuracy_matrix = np.empty(shape=(train_inputs.shape[0], train_data_count))
+        for n_idx, n in enumerate(possible_valus_of_n):
+            for k_idx, k in enumerate(range(1, train_data_count+1)):
+                predicted_labels = self.majority_based_knn(
+                    train_inputs=train_inputs, train_outputs=train_outputs,
+                    test_inputs=validation_inputs, n=n, k=k
+                )
+                accuracy = self.calculate_accuracy(
+                    predicted_labels=predicted_labels,
+                    actual_labels=validation_outputs
+                )
+                accuracy_matrix[n_idx][k_idx] = accuracy
+
+        max_accuracy = np.max(accuracy_matrix)
+        ties = (accuracy_matrix == max_accuracy)
+
+        n_idx = np.any(ties, axis=1)
+        n = possible_valus_of_n[n_idx]
+        k = np.argmax(ties[n_idx, :]) + 1
+        return np.array([k, n], dtype=int)
 
     @staticmethod
     def calculate_accuracy(predicted_labels, actual_labels):
