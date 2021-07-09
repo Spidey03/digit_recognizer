@@ -38,8 +38,35 @@ class HandWritterDigitRecognition:
         validation_inputs = shuffled_variables[train_data_count:]
         validation_outputs = shuffled_labels[train_data_count:]
 
+    def distance_weighted_knn(self, train_inputs, train_outputs, test_inputs, n, k):
+        """
+        Predict the label using distance weighted KNN
+
+        :param train_inputs: a 2D numpy array of floats where each row represents a training input instance
+        :param train_outputs: a 2D numpy array that represents the labels corresponds to train_inputs
+        :param test_inputs: a 2D numpy array of floats which represent training instances
+        :param n: n is for compute LN Norm distance
+        :param k: k is the number of closest neighbours to consider
+        :return:
+        """
+        unique_class_labels = np.unique(train_outputs)
+        weights = np.zeros(shape=(train_inputs.shape[0], unique_class_labels.shape[0]))
+        for test_idx, test_input in enumerate(test_inputs):
+            k_distance_indices, k_distances = self.k_nearest_neightbours(
+                train_inputs=train_inputs, test_input=test_input, n=n, k=k
+            )
+            predicted_labels = train_outputs[k_distance_indices]
+            for label_idx, label in enumerate(unique_class_labels):
+                label_weight = np.sum(np.where(predicted_labels == label, 1/k_distances, 0.0))
+                weights[test_idx][label_idx] = label_weight
+
+        highest_label_indices = np.argmax(weights, axis=1)
+        return unique_class_labels[highest_label_indices]
+
     def k_nearest_neightbours(self, train_inputs, test_input, n, k):
         """
+        Get K nearest neighbours of the test inputs
+
         :param train_inputs: a 2D numpy array of floats where each row represents a training input instance
         :param test_input: a 1D numpy array of floats which represent training instance
         :param n: n is for compute LN Norm distance
@@ -55,6 +82,7 @@ class HandWritterDigitRecognition:
             kth_nearesh_neighbour_index = indices[k - 1]  # last most neighbour
             kth_neighbour_distance = distances[kth_nearesh_neighbour_index]
             indices_except_top_k = indices[k:]
+            # distance tie
             distance_of_points_except_top_k = distances[indices_except_top_k]
             kth_dist_repeat_count = np.count_nonzero(distance_of_points_except_top_k == kth_neighbour_distance)
         indices_of_k_neighbours = indices[:(k+kth_dist_repeat_count)]
