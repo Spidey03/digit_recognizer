@@ -176,3 +176,17 @@ class HandWritterDigitRecognition:
         abs_diff = np.abs(train_inputs - test_input)
         summation = np.sum(np.power(abs_diff, n), axis=1)
         return np.power(summation, 1 / n)
+
+
+if __name__ == "__main__":
+    digit_recognition = HandWritterDigitRecognition()
+    variables, labels = digit_recognition.get_data_from_train_data_file()
+
+    validation_split_percent = 30
+    n = np.array([1, 2, 3])
+    best_k_n = digit_recognition.get_best_k_n_values_using_validation_set(
+        variables=variables, labels=labels.reshape(-1,),
+        validation_split_percent=validation_split_percent,
+        possible_values_of_n=n
+    )
+    print(best_k_n)
