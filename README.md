@@ -8,6 +8,8 @@ ________  .__       .__  __    __________                                  .__
 /_______  /__\___  /|__||__|    |____|_  /\___  >\___  >____/\___  /|___|  /__/_____ \\___  >__|   
         \/  /_____/                    \/     \/     \/     /_____/      \/         \/    \/       
 </pre>
+## ABOUT
+Simplest Machine Learning Model to recognizing hand written digits.
 
 ### MNIST Dataset
 
