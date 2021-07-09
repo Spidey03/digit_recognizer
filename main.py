@@ -38,6 +38,52 @@ class HandWritterDigitRecognition:
         validation_inputs = shuffled_variables[train_data_count:]
         validation_outputs = shuffled_labels[train_data_count:]
 
+    def majority_based_knn(self, train_inputs, train_outputs, test_inputs, n, k):
+        """
+        predict the label for test inputs based on the majority among K nearest neighbours
+
+        :param train_inputs: a 2D numpy array of floats where each row represents a training input instance
+        :param train_outputs: a 2D numpy array that represents the labels corresponds to train_inputs
+        :param test_inputs: a 2D numpy array of floats which represent training instances
+        :param n: n is for compute LN Norm distance
+        :param k: k is the number of closest neighbours to consider
+        :return:
+        """
+        unique_class_labels = np.unique(train_outputs)
+        num_of_unique_class_labels = unique_class_labels.shape[0]
+
+        label_wise_counts = np.zeros(test_inputs.shape[0], num_of_unique_class_labels)
+        label_wise_weights = np.zeros(test_inputs.shape[0], num_of_unique_class_labels)
+
+        for test_idx, test_input in enumerate(test_inputs):
+            k_distance_indices, k_distances = self.k_nearest_neightbours(
+                train_inputs=train_inputs, test_input=test_input, n=n, k=k
+            )
+            predicted_labels = train_outputs[k_distance_indices]
+            for label_idx, label in enumerate(unique_class_labels):
+                label_weight = np.sum(np.where(predicted_labels == label, 1 / k_distances, 0.0))
+                label_count = np.count_nonzero(np.where(predicted_labels == label))
+                label_wise_weights[test_idx][label_idx] = label_weight
+                label_wise_counts[test_idx][label_idx] = label_count
+
+        output_labels = np.empty(test_inputs.shape[0], dtype=int)
+        sorted_count_indices = np.argsort(label_wise_counts, axis=1)
+
+        for test_idx, label_indices in enumerate(sorted_count_indices):
+            highest_count = label_wise_counts[test_idx][label_indices[num_of_unique_class_labels-1]]
+            highest_label_repeat = np.count_nonzero(label_wise_counts[test_idx] == highest_count)
+            no_voting_tie = (highest_label_repeat == 1)
+            if no_voting_tie:
+                output_labels[test_idx] = unique_class_labels[label_indices[num_of_unique_class_labels-1]]
+            else:
+                tied_class_indices = label_indices[num_of_unique_class_labels-highest_label_repeat:]
+                tied_class_weights = label_wise_weights[test_idx][tied_class_indices]
+                max_weight_idx = np.argmax(tied_class_weights)
+                max_idx = tied_class_weights[max_weight_idx]
+                output_labels[test_idx] = unique_class_labels[max_idx]
+
+        return output_labels
+
     def distance_weighted_knn(self, train_inputs, train_outputs, test_inputs, n, k):
         """
         Predict the label using distance weighted KNN
