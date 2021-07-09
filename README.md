@@ -35,7 +35,7 @@ The `LN Norm distances` gives the distance between two points.
 
 By using LN Norm, we can find distances between test input and training input
 
->![equation](https://latex.codecogs.com/svg.image?\bg_white&space;\sqrt[n]{\sum_{i=1}^{n}\left|a_{i}-b_{i}&space;\right|^{n}}&space;)
+>![distance](https://latex.codecogs.com/png.image?\dpi{110}%20\sqrt[n]{\sum_{i=1}^{n}\left|a_{i}-b_{i}&space;\right|^{n}})
 
 
 ### _Get K Nearest Neighbours_
