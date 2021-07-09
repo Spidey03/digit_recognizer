@@ -38,6 +38,12 @@ class HandWritterDigitRecognition:
         validation_inputs = shuffled_variables[train_data_count:]
         validation_outputs = shuffled_labels[train_data_count:]
 
+    @staticmethod
+    def calculate_accuracy(predicted_labels, actual_labels):
+        true_predictions = np.count_nonzero(predicted_labels==actual_labels)
+        accuracy = (true_predictions/actual_labels.size)
+        return accuracy
+
     def majority_based_knn(self, train_inputs, train_outputs, test_inputs, n, k):
         """
         predict the label for test inputs based on the majority among K nearest neighbours
